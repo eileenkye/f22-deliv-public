@@ -50,7 +50,7 @@ export default function EntryModal({ entry, type, user }) {
       setOpen(false);
    };
 
-   // Mutation handlers
+   // Mutation handlers!
 
    const handleAdd = () => {
       const newEntry = {
@@ -164,6 +164,8 @@ export default function EntryModal({ entry, type, user }) {
                      {categories.map((category) => (<MenuItem value={category.id}>{category.name}</MenuItem>))}
                   </Select>
                </FormControl>
+               <div {type === "edit" ? name : "Add Entry"}>
+               </div>
             </DialogContent>
             {actionButtons}
          </Dialog>

@@ -35,6 +35,7 @@ export default function EntryModal({ entry, type, user }) {
    const [link, setLink] = useState(entry.link);
    const [description, setDescription] = useState(entry.description);
    const [category, setCategory] = React.useState(entry.category);
+   const [notes, setNotes] = React.useState(entry.category);
 
    // Modal visibility handlers
 
@@ -44,21 +45,30 @@ export default function EntryModal({ entry, type, user }) {
       setLink(entry.link);
       setDescription(entry.description);
       setCategory(entry.category);
+      setNotes(entry.notes);
    };
 
    const handleClose = () => {
       setOpen(false);
    };
 
-   // Mutation handlers!
+   // Mutation handlers
 
    const handleAdd = () => {
+   	  var newLink = ""
+   	  if(!link.startsWith('https://')) {
+        newLink = 'https://' + link
+      }
+      else{
+      	newLink = link
+      }
       const newEntry = {
          name: name,
-         link: link,
+         link: newLink,
          description: description,
          user: user?.displayName,
          category: category,
+         notes: notes,
          userid: user?.uid,
       };
 
@@ -66,30 +76,36 @@ export default function EntryModal({ entry, type, user }) {
       handleClose();
    };
 
-   // TODO: Add Edit Mutation Handler
-
    const handleEdit = () => {
+   	  var newLink = ""
+   	  if(!link.startsWith('https://')) {
+   	  	newLink = 'https://' + link
+      }
+      else{
+      	newLink = link
+      }
    	  const newEntry = {
          name: name,
-         link: link,
+         link: newLink,
          description: description,
          category: category,
+         notes: notes,
          id: entry.id
       };
+
       updateEntry(newEntry).catch(console.error);
       handleClose();
    };
 
-   // TODO: Add Delete Mutation Handler
-
    const handleDelete = () => {
-      deleteEntry(entry).catch(console.error);
+   	  if(window.confirm("Are you sure you want to delete this?")){
+   	  	deleteEntry(entry).catch(console.error);
+   	  }
       handleClose();
    };
 
    // Button handlers for modal opening and inside-modal actions.
    // These buttons are displayed conditionally based on if adding or editing/opening.
-   // TODO: You may have to edit these buttons to implement editing/deleting functionality.
 
    const openButton =
       type === "edit" ? <IconButton onClick={handleClickOpen}>
@@ -103,6 +119,7 @@ export default function EntryModal({ entry, type, user }) {
    const actionButtons =
       type === "edit" ?
          <DialogActions>
+            <Button onClick={() => {window.open("https://www.google.com/search?q="+name)}}>More Info</Button>
             <Button onClick={handleClose}>Cancel</Button>
             <Button onClick={handleDelete}>Delete</Button>
             <Button onClick={handleEdit}>Edit</Button>
@@ -151,6 +168,17 @@ export default function EntryModal({ entry, type, user }) {
                   value={description}
                   onChange={(event) => setDescription(event.target.value)}
                />
+               <TextField
+                  margin="normal"
+                  id="description"
+                  label="Notes"
+                  fullWidth
+                  variant="standard"
+                  multiline
+                  maxRows={8}
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
+               />
 
                <FormControl fullWidth sx={{ "margin-top": 20 }}>
                   <InputLabel id="demo-simple-select-label">Category</InputLabel>
@@ -164,8 +192,6 @@ export default function EntryModal({ entry, type, user }) {
                      {categories.map((category) => (<MenuItem value={category.id}>{category.name}</MenuItem>))}
                   </Select>
                </FormControl>
-               <div {type === "edit" ? name : "Add Entry"}>
-               </div>
             </DialogContent>
             {actionButtons}
          </Dialog>
